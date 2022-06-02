@@ -35,6 +35,6 @@ def create_person(
 @app.get("/person/detail")
 def show_person(
     name: Optional[str] = Query(default=None, min_length=1, max_length=50),
-    age: str = Query(...) # required query parameter
+    age: int = Query(default=...,ge=18) # required query parameter and greater or equal than 18
 ):
     return {name: age}
