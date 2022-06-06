@@ -3,7 +3,7 @@ from typing import Optional
 
 # Pydantic
 from pydantic import BaseModel
-
+ 
 # FastAPI
 from fastapi import FastAPI, Body, Path, Query
 
@@ -17,6 +17,11 @@ class Person(BaseModel):
     age: int
     hair_color: Optional[str] = None
     is_married: Optional[bool] = None
+
+class Location(BaseModel):
+    city: str
+    state: str
+    country: str    
 
 @app.get("/")
 def home():
@@ -58,3 +63,20 @@ def show_person(
         )
 ):
     return {person_id: f"It exists!"} 
+
+# Validations: Request Body
+
+@app.put("/person/{person_id}")
+def update_person(
+    person_id: int = Path(
+        ...,
+        title="Person ID",
+        description="This is the person ID",
+        gt=0
+        ),
+    person: Person = Body(...),
+    location: Location = Body(...)
+):
+    results = person.dict()
+    results.update(location.dict())
+    return results
