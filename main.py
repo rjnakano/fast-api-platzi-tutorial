@@ -43,6 +43,25 @@ class Person(BaseModel):
     url: Optional[HttpUrl] = Field(default=None)
     facebook_url: Optional[HttpUrl] = Field(None)
     
+    class Config:
+        schema_extra = {
+            "example":{
+                "first_name": "Ryuma",
+                "last_name": "Nakano",
+                "age": 37,
+                "hair_color": "brown",
+                "is_married": True,
+                "email": "ryuma@nakasan.co"
+            },
+            "Lorena":{
+                "first_name": "Lorena",
+                "last_name": "Sanchez",
+                "age": 30,
+                "hair_color": "blonde",
+                "is_married": False,
+                "email": "lorena@nakasan.co"
+            }
+        }
     
     @validator('facebook_url')
     def check_facebook_url(cls, v):
@@ -55,6 +74,7 @@ class Person(BaseModel):
         return v
     
     
+            
 
 class Location(BaseModel):
     city: str = Field(
@@ -130,3 +150,4 @@ def update_person(
     results = person.dict()
     results.update(location.dict())
     return results
+    
