@@ -1,17 +1,19 @@
 # Python
+from optparse import Option
 from typing import Optional
 from enum import Enum
+from utils.errors import *
 
 # Pydantic
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr, PaymentCardNumber, HttpUrl, validator
  
 # FastAPI
 from fastapi import FastAPI, Body, Path, Query
 
 app = FastAPI()
 
-# Models
 
+# Models
 class HairColor(Enum):
     white = "white"
     brown = "brown"
@@ -36,11 +38,40 @@ class Person(BaseModel):
         )
     hair_color: Optional[HairColor] = Field(default=None)
     is_married: Optional[bool] = Field(default=None) 
+    email: Optional[EmailStr] = Field(default=None)
+    credit_card: Optional[PaymentCardNumber] = Field(default=None)
+    url: Optional[HttpUrl] = Field(default=None)
+    facebook_url: Optional[HttpUrl] = Field(None)
+    
+    
+    @validator('facebook_url')
+    def check_facebook_url(cls, v):
+        if v.host != "facebook.com" or v.scheme != 'https':
+            raise FacebookUrlDomainError()   
+        
+        if v.path is None or len(v.path)<2: 
+            raise FacebookUrlProfileError()
+        
+        return v
+    
+    
 
 class Location(BaseModel):
-    city: str
-    state: str
-    country: str    
+    city: str = Field(
+        ..., 
+        min_length=1, 
+        max_length=20
+        )
+    state: str = Field(
+        ..., 
+        min_length=2, 
+        max_length=20
+        )
+    country: str = Field(
+        ..., 
+        min_length=1, 
+        max_length=20
+        )   
 
 @app.get("/")
 def home():
