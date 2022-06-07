@@ -1,4 +1,5 @@
 # Python
+from doctest import Example
 from optparse import Option
 from typing import Optional
 from enum import Enum
@@ -80,17 +81,20 @@ class Location(BaseModel):
     city: str = Field(
         ..., 
         min_length=1, 
-        max_length=20
+        max_length=20,
+        example="Clearwater"
         )
     state: str = Field(
         ..., 
         min_length=2, 
-        max_length=20
+        max_length=20,
+        example="FL"
         )
     country: str = Field(
         ..., 
         min_length=1, 
-        max_length=20
+        max_length=20,
+        example="United States"
         )   
 
 @app.get("/")
