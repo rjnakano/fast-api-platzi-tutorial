@@ -13,7 +13,6 @@ from fastapi import FastAPI, Body, Path, Query
 
 app = FastAPI()
 
-
 # Models
 class HairColor(Enum):
     white = "white"
@@ -74,9 +73,6 @@ class Person(BaseModel):
         
         return v
     
-    
-            
-
 class Location(BaseModel):
     city: str = Field(
         ..., 
@@ -109,7 +105,6 @@ def create_person(
     return person
 
 # Validations: Query parameters
-
 @app.get("/person/detail")
 def show_person(
     name: Optional[str] = Query(
@@ -117,13 +112,15 @@ def show_person(
         min_length=1, 
         max_length=50,
         title="Person Name",
-        description="This is the person's fullname. It has to be between 1 and 50 characters"
+        description="This is the person's fullname. It has to be between 1 and 50 characters",
+        example="Lorena"
         ),
     age: int = Query(
         default=...,
         ge=18,
         title="Person Age",
-        description="This is the person's age. It's required and has to be greater on equal than 18"
+        description="This is the person's age. It's required and has to be greater on equal than 18",
+        example="30"
         ) # required query parameter and greater or equal than 18 (ge,gt,le,lt)
 ):
     return {name: age}
@@ -133,20 +130,21 @@ def show_person(
 def show_person(
     person_id: int = Path(
         default=...,
-        gt=0
+        gt=0,
+        example=12
         )
 ):
     return {person_id: f"It exists!"} 
 
 # Validations: Request Body
-
 @app.put("/person/{person_id}")
 def update_person(
     person_id: int = Path(
         ...,
         title="Person ID",
         description="This is the person ID",
-        gt=0
+        gt=0,
+        example=18
         ),
     person: Person = Body(...),
     location: Location = Body(...)
