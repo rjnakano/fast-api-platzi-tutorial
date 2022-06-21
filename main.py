@@ -9,7 +9,7 @@ from utils.errors import *
 from pydantic import BaseModel, Field, EmailStr, PaymentCardNumber, HttpUrl, validator
  
 # FastAPI
-from fastapi import FastAPI, Body, Path, Query, status
+from fastapi import FastAPI, Body, Path, Query, status, Form
 
 app = FastAPI()
 
@@ -86,7 +86,6 @@ class Person(PersonBase):
 class PersonOut(PersonBase):
     pass    
     
-    
 class Location(BaseModel):
     city: str = Field(
         ..., 
@@ -107,10 +106,14 @@ class Location(BaseModel):
         example="United States"
         )   
 
+class LoginOut(BaseModel):
+    username : str = Field(..., max_length=20, example="rnakano")
+    message : str = Field(default="Login Successful!", description="Description message")
+
 @app.get(
     path="/",
     status_code=status.HTTP_200_OK
-    )
+)
 def home():
     return {"Hello":"World"}
 
@@ -119,7 +122,7 @@ def home():
     path = "/person/new", 
     response_model = PersonOut,
     status_code = status.HTTP_201_CREATED
-    )
+)
 def create_person(
     person: Person = Body(...) # required body parameter
 ):
@@ -129,7 +132,7 @@ def create_person(
 @app.get(
     path="/person/detail",
     status_code=status.HTTP_200_OK
-    )
+)
 def show_person(
     name: Optional[str] = Query(
         default=None, 
@@ -150,7 +153,10 @@ def show_person(
     return {name: age}
 
 # Validations: Path Parameters
-@app.get("/person/detail/{person_id}")
+@app.get(
+    path="/person/detail/{person_id}",
+    status_code=status.HTTP_200_OK
+)
 def show_person(
     person_id: int = Path(
         default=...,
@@ -161,7 +167,10 @@ def show_person(
     return {person_id: f"It exists!"} 
 
 # Validations: Request Body
-@app.put("/person/{person_id}")
+@app.put(
+    path="/person/{person_id}",
+    status_code=status.HTTP_200_OK
+)
 def update_person(
     person_id: int = Path(
         ...,
@@ -176,4 +185,15 @@ def update_person(
     results = person.dict()
     results.update(location.dict())
     return results
+
+@app.post(
+    path="/login",
+    response_model=LoginOut,
+    status_code=status.HTTP_200_OK
+)
+def login(
+    username: str = Form(...),
+    password:str = Form(...)
+):
+    return LoginOut(username=username) # The class must be instanciated to be able to cast it to a JSON format. Otherwise, it will fail
     
