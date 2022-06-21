@@ -77,6 +77,8 @@ class Person(BaseModel):
         
         return v
     
+
+    
 class Location(BaseModel):
     city: str = Field(
         ..., 
@@ -102,7 +104,9 @@ def home():
     return {"Hello":"World"}
 
 # Request and response body
-@app.post("/person/new")
+@app.post("/person/new", 
+          response_model=Person,
+          response_model_exclude={'password'}) # Excludes the password from the returned object
 def create_person(
     person: Person = Body(...) # required body parameter
 ):
