@@ -9,7 +9,7 @@ from utils.errors import *
 from pydantic import BaseModel, Field, EmailStr, PaymentCardNumber, HttpUrl, validator
  
 # FastAPI
-from fastapi import FastAPI, Body, Path, Query
+from fastapi import FastAPI, Body, Path, Query, status
 
 app = FastAPI()
 
@@ -71,6 +71,7 @@ class PersonBase(BaseModel):
     def check_facebook_url(cls, v):
         if v is None:
             return v
+        
         if v.host != "facebook.com" or v.scheme != 'https':
             raise FacebookUrlDomainError()   
         
@@ -106,20 +107,29 @@ class Location(BaseModel):
         example="United States"
         )   
 
-@app.get("/")
+@app.get(
+    path="/",
+    status_code=status.HTTP_200_OK
+    )
 def home():
     return {"Hello":"World"}
 
 # Request and response body
-@app.post("/person/new", 
-          response_model=PersonOut)
+@app.post(
+    path = "/person/new", 
+    response_model = PersonOut,
+    status_code = status.HTTP_201_CREATED
+    )
 def create_person(
     person: Person = Body(...) # required body parameter
 ):
     return person
 
 # Validations: Query parameters
-@app.get("/person/detail")
+@app.get(
+    path="/person/detail",
+    status_code=status.HTTP_200_OK
+    )
 def show_person(
     name: Optional[str] = Query(
         default=None, 
