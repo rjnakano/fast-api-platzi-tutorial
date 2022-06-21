@@ -9,7 +9,7 @@ from utils.errors import *
 from pydantic import BaseModel, Field, EmailStr, PaymentCardNumber, HttpUrl, validator
  
 # FastAPI
-from fastapi import FastAPI, Body, Path, Query, status, Form, Header, Cookie
+from fastapi import FastAPI, Body, File, Path, Query, UploadFile, status, Form, Header, Cookie
 
 app = FastAPI()
 
@@ -223,3 +223,16 @@ def contact(
     ads: Optional[str] = Cookie(default=None)
 ):
     return user_agent
+
+# Files
+@app.post(
+    path="/post-image"
+)
+def post_image(
+    image: UploadFile = File(...)
+):
+    return {
+        "Filaname": image.filename,
+        "Format": image.content_type,
+        "Size(kb)": round(len(image.file.read())/1024,ndigits=2)
+    }
