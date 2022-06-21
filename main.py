@@ -21,7 +21,8 @@ class HairColor(Enum):
     blonde = "blonde"
     red = "red"
 
-class Person(BaseModel):
+# Creating a new class to inheret from and avoid possible errors.
+class PersonBase(BaseModel):
     first_name: str = Field(
         default=...,
         min_length=1,
@@ -39,7 +40,6 @@ class Person(BaseModel):
     hair_color: Optional[HairColor] = Field(default=None)
     is_married: Optional[bool] = Field(default=None) 
     email: EmailStr = Field(default=None)
-    password: str = Field(..., min_length=8)
     credit_card: Optional[PaymentCardNumber] = Field(default=None)
     url: Optional[HttpUrl] = Field(default=None)
     facebook_url: Optional[HttpUrl] = Field(None)
@@ -69,6 +69,8 @@ class Person(BaseModel):
     
     @validator('facebook_url')
     def check_facebook_url(cls, v):
+        if v is None:
+            return v
         if v.host != "facebook.com" or v.scheme != 'https':
             raise FacebookUrlDomainError()   
         
@@ -77,7 +79,12 @@ class Person(BaseModel):
         
         return v
     
-
+class Person(PersonBase):
+    password: str = Field(..., min_length=8)
+    
+class PersonOut(PersonBase):
+    pass    
+    
     
 class Location(BaseModel):
     city: str = Field(
@@ -105,8 +112,7 @@ def home():
 
 # Request and response body
 @app.post("/person/new", 
-          response_model=Person,
-          response_model_exclude={'password'}) # Excludes the password from the returned object
+          response_model=PersonOut)
 def create_person(
     person: Person = Body(...) # required body parameter
 ):
