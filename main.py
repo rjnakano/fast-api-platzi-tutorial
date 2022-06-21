@@ -38,10 +38,12 @@ class Person(BaseModel):
         )
     hair_color: Optional[HairColor] = Field(default=None)
     is_married: Optional[bool] = Field(default=None) 
-    email: Optional[EmailStr] = Field(default=None)
+    email: EmailStr = Field(default=None)
+    password: str = Field(..., min_length=8)
     credit_card: Optional[PaymentCardNumber] = Field(default=None)
     url: Optional[HttpUrl] = Field(default=None)
     facebook_url: Optional[HttpUrl] = Field(None)
+    
     
     class Config:
         schema_extra = {
@@ -51,7 +53,9 @@ class Person(BaseModel):
                 "age": 37,
                 "hair_color": "brown",
                 "is_married": True,
-                "email": "ryuma@nakasan.co"
+                "email": "ryuma@nakasan.co",
+                "password": "admin123",
+                "created_at": "2022/06/07 13:11:20"
             },
             "Lorena":{
                 "first_name": "Lorena",
