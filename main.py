@@ -9,7 +9,7 @@ from utils.errors import *
 from pydantic import BaseModel, Field, EmailStr, PaymentCardNumber, HttpUrl, validator
  
 # FastAPI
-from fastapi import FastAPI, Body, Path, Query, status, Form
+from fastapi import FastAPI, Body, Path, Query, status, Form, Header, Cookie
 
 app = FastAPI()
 
@@ -186,6 +186,7 @@ def update_person(
     results.update(location.dict())
     return results
 
+# Forms
 @app.post(
     path="/login",
     response_model=LoginOut,
@@ -196,4 +197,29 @@ def login(
     password:str = Form(...)
 ):
     return LoginOut(username=username) # The class must be instanciated to be able to cast it to a JSON format. Otherwise, it will fail
-    
+
+# Cookies and header parameters    
+@app.post(
+    path="/contact",
+    status_code=status.HTTP_200_OK
+)
+def contact(
+    first_name:str = Form(
+        ...,
+        max_length=20,
+        min_length=1
+    ),
+    last_name:str = Form(
+        ...,
+        max_length=20,
+        min_length=1
+    ),
+    email : EmailStr = Form(...),
+    message: str = Form(
+        ...,
+        min_length=20
+    ),
+    user_agent: Optional[str]= Header(default=None),
+    ads: Optional[str] = Cookie(default=None)
+):
+    return user_agent
